@@ -2,13 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { StockModel } from '../models/stock-model';
 import { StockVizService } from './stock-viz.service';
-// import * as d3 from 'd3';
+// import 'chartjs-plugin-annotation';
+// // import * as d3 from 'd3';
 
-// import * as Chart from 'Chart.js';
-// import { Chart } from 'chart.js'
-import { Chart, registerables } from 'chart.js';
+import { Chart, ChartType, ChartConfiguration, registerables } from 'chart.js';
 Chart.register(...registerables);
+import 'chartjs-plugin-annotation';
+// import ChartAnnotation from 'chartjs-plugin-annotation';
+// import { Chart, ChartConfiguration } from 'chart.js';
+
+
 import 'chartjs-adapter-moment';
+import { _capitalize } from 'chart.js/dist/helpers/helpers.core';
 
 @Component({
   selector: 'app-stock-viz',
@@ -47,8 +52,8 @@ export class StockVizComponent implements OnInit {
     this.statsCalculated = true;
   }
 
-  onSubmit() {
-    this.ticker = this.stockForm.value.ticker;
+  onSelectTicker(tickerSymbol: string) {
+    this.ticker = tickerSymbol;
     this.stockData = this.stockService.getData(this.ticker);
     this.createLineChart(this.stockData, true);
     this.stockService.bestBuyAndSell(this.stockData);
@@ -61,38 +66,61 @@ export class StockVizComponent implements OnInit {
     // extract the dates and high values from the stock data
     const dates = stockData.map(data => data.Date);
     const high = stockData.map(data => data.High);
+    const avgHigh = high.reduce((a, b) => a + b, 0) / high.length;
 
-    // create the chart
-    const ctx = <HTMLCanvasElement>document.getElementById('line-chart');
-    if (ctx) {
-      this.lineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: dates,
-          datasets: [{
-            label: 'High',
-            data: high,
-            borderColor: '#39FF14',
-            fill: false
-          }]
-        },
-        options: {
+    //Data for plot
+    const data = {
+      labels: dates,
+      datasets: [{
+        label: 'High',
+        data: high,
+        borderColor: '#39FF14',
+        fill: false
+      }]
+    }
+
+    //Buy line
+    const avgHighLine = {
+      id: 'avgHighLine',
+      beforeDraw(chart: any, args: any, options: any) {
+        const { ctx,
+          chartArea: { top, right, bottom, left, width, height },
           scales: {
-            x: {
-              type: 'time',
-              time: {
-                parser: 'YYYY-MM-DD'
-              }
+            x, y
+          } } = chart;
+        ctx.save();
+
+        ctx.strokeStyle = 'blue';
+        // ctx.strokeRect(left, chart.getDatasetMeta(0).data[650].y, right, 1)
+        ctx.strokeRect(left, y.getPixelForValue(avgHigh), right, 1);
+        ctx.restore();
+      },
+      label: {
+        content: `Avg High: ${avgHigh}`,
+        position: 'bottom'
+      }
+    }
+
+    //Basic chart config
+    const config: ChartConfiguration = {
+      type: 'line',
+      data,
+      options: {
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              parser: 'YYYY-MM-DD'
             }
           }
         }
-      });
-    } else {
-      console.error('Canvas element not found');
+      },
+      plugins: [avgHighLine]
     }
 
-
+    this.lineChart = new Chart(
+      <HTMLCanvasElement>document.getElementById('line-chart'),
+      config
+    )
   }
-
-
 }

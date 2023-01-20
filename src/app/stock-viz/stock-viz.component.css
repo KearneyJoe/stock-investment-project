@@ -1,7 +1,5 @@
-/* .wrap {
-    display: flex;
+.btn-group .active {
+    background-color: #39FF14;
+    color: black;
+    border: 1px solid white;
 }
-
-label {
-    display: inline-block;
-} */
