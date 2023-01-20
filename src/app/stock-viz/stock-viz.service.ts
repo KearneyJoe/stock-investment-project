@@ -33,7 +33,6 @@ export class StockVizService {
     }
 
     bestBuyAndSell(stockData: StockModel[]) {
-
         let buy = 0;
         let bestBuyIdx = 0;
         let sell = 1;
@@ -62,6 +61,7 @@ export class StockVizService {
 
     calculateStockStats(stockData: StockModel[]) {
 
+        //TODO: Call best buy and sell in here
         let maxHigh = 0;
         let maxHighData: StockModel | undefined;
         let minHigh = null;
