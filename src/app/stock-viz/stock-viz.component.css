@@ -1,5 +1,127 @@
-.btn-group .active {
-    background-color: #39FF14;
-    color: black;
-    border: 1px solid white;
+body {
+    margin: 0;
+    padding: 0;
 }
+
+h1,
+h1,
+h3,
+h4,
+h5,
+h6,
+table {
+    color: #1f2421
+}
+
+.btn-group {
+    font-weight: bold;
+}
+
+.btn-group .active {
+    background-color: #49a078;
+    color: #1f2421;
+    border: 1px solid white;
+    font-weight: bolder;
+}
+
+.center-checkbox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+table th,
+table td {
+    text-align: center;
+}
+
+td {
+    vertical-align: middle;
+}
+
+.form-check-input {
+    transform: scale(1.5);
+}
+
+h3>span {
+    font-weight: bold;
+    color: #49a078
+}
+
+span>button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-right: 6px;
+    padding-left: 6px;
+}
+
+@media (max-width: 768px) {
+    .btn {
+        font-size: 0.6em;
+        padding: 4px 6px;
+    }
+
+    .btn-group .active {
+        font-size: 0.75em;
+    }
+
+    table {
+        font-size: 0.6em;
+    }
+}
+
+@media (min-width: 768px) {
+    .btn {
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+
+    .btn-group .active {
+        font-size: 0.95em;
+    }
+
+    table {
+        font-size: 0.8em;
+    }
+}
+
+@media (min-width: 992px) {
+    .btn {
+        font-size: 1em;
+        padding: 8px 12px;
+    }
+
+    .btn-group .active {
+        font-size: 1.15em;
+    }
+
+    table {
+        font-size: 1em;
+    }
+}
+
+@media (min-width: 1200px) {
+    .btn {
+        padding: 10px 16px;
+        font-size: 1.2em;
+    }
+
+    .btn-group .active {
+        font-size: 1.35em;
+    }
+
+    table {
+        font-size: 1.2em;
+    }
+}
+
+/* 1 = dark
+3 = green
+5 = grey */
+/* 
+1f2421
+216869
+49a078
+9cc5a1
+dce1de  
+*/

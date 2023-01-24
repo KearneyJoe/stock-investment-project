@@ -6,6 +6,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 Chart.register(...registerables);
 import 'chartjs-plugin-annotation';
 import 'chartjs-adapter-moment';
+Chart.defaults.color = '#1f2421';
 
 @Component({
   selector: 'app-stock-viz',
@@ -76,9 +77,10 @@ export class StockVizComponent implements OnInit {
     const data = {
       labels: dates,
       datasets: [{
-        label: 'High',
+        label: 'Trading High',
+        color: '#49a078',
         data: high,
-        borderColor: '#39FF14',
+        borderColor: '#49a078',
         fill: false
       }]
     }
@@ -91,11 +93,85 @@ export class StockVizComponent implements OnInit {
         scales: {
           x: {
             type: 'time',
+            grid: {
+              drawOnChartArea: false
+            },
             time: {
               parser: 'YYYY-MM-DD'
+            },
+            title: {
+              display: true,
+              text: 'Day',
+              color: '#1f2421',
+              font: {
+                size: 16,
+                style: 'normal',
+                weight: 'bold'
+              }
+            }
+          },
+          y: {
+            grid: {
+              drawOnChartArea: true
+            },
+            ticks: {
+              // Include a dollar sign in the ticks
+              callback: function (value, index, ticks) {
+                return '$' + value;
+              }
+            },
+            title: {
+              display: true,
+              text: 'Trading High',
+              color: '#1f2421',
+              font: {
+                size: 16,
+                style: 'normal',
+                weight: 'bold'
+              }
             }
           }
-        }
+        },
+        elements: {
+          point: {
+            radius: 0
+          }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#1f2421',
+              font: {
+                size: 16,
+                style: 'normal',
+                weight: 'bold'
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              title: function (context) {
+                return new Date(context[0].label).toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" });
+              },
+              label: function (context) {
+                let label = context.dataset.label || '';
+
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                }
+                return label;
+              }
+            },
+            displayColors: false
+          }
+        },
+        hover: {
+          mode: 'nearest',
+          intersect: true
+        },
       },
       //Add in plugins dynamically
       plugins: []
@@ -124,14 +200,14 @@ export class StockVizComponent implements OnInit {
             } } = chart;
           ctx.save();
 
-          ctx.strokeStyle = 'blue';
+          ctx.strokeStyle = '#1f2421';
           ctx.strokeRect(left, y.getPixelForValue(avgHigh), right, 1);
           ctx.restore();
 
           //Adding labels
           ctx.font = '18px Arial'
-          ctx.fillStyle = 'black'
-          ctx.fillText(`Average High $${avgHigh.toFixed(0).toLocaleString()}`, dates.length * .05, y.getPixelForValue(avgHigh) - 15)
+          ctx.fillStyle = '#1f2421'
+          ctx.fillText(`Average High $${avgHigh.toFixed(0).toLocaleString()}`, dates.length * .10, y.getPixelForValue(avgHigh) - 15)
 
         }
       }
@@ -153,8 +229,6 @@ export class StockVizComponent implements OnInit {
       }
       this.avgLineToggle = false;
     }
-
-
   }
 
   controlBestBuyLine() {
@@ -174,15 +248,16 @@ export class StockVizComponent implements OnInit {
 
             //Creating the line
             ctx.strokeStyle = 'red';
-            ctx.moveTo(x.getPixelForValue(bestDay), top)
+            ctx.beginPath()
+            ctx.moveTo(x.getPixelForValue(bestDay), top - top * 0.5)
             ctx.lineTo(x.getPixelForValue(bestDay), bottom)
             ctx.stroke()
             ctx.restore();
 
             //Adding labels
             ctx.font = '18px Arial'
-            ctx.fillStyle = 'black'
-            ctx.fillText(`Buy: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top)
+            ctx.fillStyle = '#1f2421'
+            ctx.fillText(`Buy: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top - top * 0.25)
           }
         }
         this.lineChart.config.plugins?.push(bestBuyLine)
@@ -204,7 +279,6 @@ export class StockVizComponent implements OnInit {
       }
       this.bestBuyLineToggle = false;
     }
-
   }
 
   controlBestSellLine() {
@@ -225,15 +299,16 @@ export class StockVizComponent implements OnInit {
 
             //Creating the line
             ctx.strokeStyle = 'red';
-            ctx.moveTo(x.getPixelForValue(bestDay), top)
+            ctx.beginPath()
+            ctx.moveTo(x.getPixelForValue(bestDay), top - top * 0.5)
             ctx.lineTo(x.getPixelForValue(bestDay), bottom)
             ctx.stroke()
             ctx.restore();
 
             //Adding labels
             ctx.font = '18px Arial'
-            ctx.fillStyle = 'black'
-            ctx.fillText(`Sell: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top)
+            ctx.fillStyle = '#1f2421'
+            ctx.fillText(`Sell: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top - top * 0.25)
           }
         }
         this.lineChart.config.plugins?.push(bestSellLine)
@@ -255,7 +330,6 @@ export class StockVizComponent implements OnInit {
       }
       this.bestSellLineToggle = false;
     }
-
   }
 
   resetChart() {
