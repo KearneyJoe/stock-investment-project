@@ -81,15 +81,17 @@ export class StockVizComponent implements OnInit {
         color: '#49a078',
         data: high,
         borderColor: '#49a078',
-        fill: false
+        fill: false,
+        backgroundColor: '#49a078'
       }]
     }
-
     //Basic chart config
     let config: ChartConfiguration = {
       type: 'line',
       data,
       options: {
+        maintainAspectRatio: true,
+        responsive: true,
         scales: {
           x: {
             type: 'time',
@@ -139,10 +141,13 @@ export class StockVizComponent implements OnInit {
         },
         plugins: {
           legend: {
+            position: 'bottom',
+            align: 'end',
             labels: {
               color: '#1f2421',
               font: {
-                size: 16,
+                size: 14,
+                // size: ,
                 style: 'normal',
                 weight: 'bold'
               }
@@ -201,11 +206,13 @@ export class StockVizComponent implements OnInit {
           ctx.save();
 
           ctx.strokeStyle = '#1f2421';
+          ctx.lineWidth = 2;
           ctx.strokeRect(left, y.getPixelForValue(avgHigh), right, 1);
           ctx.restore();
 
           //Adding labels
-          ctx.font = '18px Arial'
+          // ctx.font = '18px Arial'
+          ctx.font = `${width * 0.02}px Arial`
           ctx.fillStyle = '#1f2421'
           ctx.fillText(`Average High $${avgHigh.toFixed(0).toLocaleString()}`, dates.length * .10, y.getPixelForValue(avgHigh) - 15)
 
@@ -248,6 +255,7 @@ export class StockVizComponent implements OnInit {
 
             //Creating the line
             ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
             ctx.beginPath()
             ctx.moveTo(x.getPixelForValue(bestDay), top - top * 0.5)
             ctx.lineTo(x.getPixelForValue(bestDay), bottom)
@@ -255,9 +263,10 @@ export class StockVizComponent implements OnInit {
             ctx.restore();
 
             //Adding labels
-            ctx.font = '18px Arial'
+            // ctx.font = '18px Arial'
+            ctx.font = `${width * 0.02}px Arial`
             ctx.fillStyle = '#1f2421'
-            ctx.fillText(`Buy: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top - top * 0.25)
+            ctx.fillText(`Buy: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top + (height * .05))
           }
         }
         this.lineChart.config.plugins?.push(bestBuyLine)
@@ -299,6 +308,7 @@ export class StockVizComponent implements OnInit {
 
             //Creating the line
             ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
             ctx.beginPath()
             ctx.moveTo(x.getPixelForValue(bestDay), top - top * 0.5)
             ctx.lineTo(x.getPixelForValue(bestDay), bottom)
@@ -306,9 +316,10 @@ export class StockVizComponent implements OnInit {
             ctx.restore();
 
             //Adding labels
-            ctx.font = '18px Arial'
+            // ctx.font = '18px Arial'
+            ctx.font = `${width * 0.02}px Arial`
             ctx.fillStyle = '#1f2421'
-            ctx.fillText(`Sell: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top - top * 0.25)
+            ctx.fillText(`Sell: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top + (height * .05))
           }
         }
         this.lineChart.config.plugins?.push(bestSellLine)

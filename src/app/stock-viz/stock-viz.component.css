@@ -55,10 +55,28 @@ span>button {
     padding-left: 6px;
 }
 
+.table>thead>tr>th,
+.table>tbody>tr>th,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>tbody>tr>td,
+.table>tfoot>tr>td {
+    padding: 2px;
+}
+
 @media (max-width: 768px) {
     .btn {
         font-size: 0.6em;
-        padding: 4px 6px;
+        padding: 2px 4px;
+    }
+
+    h1,
+    h1,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-size: 1em;
     }
 
     .btn-group .active {
@@ -66,7 +84,7 @@ span>button {
     }
 
     table {
-        font-size: 0.6em;
+        font-size: 0.5em;
     }
 }
 
@@ -114,6 +132,53 @@ span>button {
         font-size: 1.2em;
     }
 }
+
+.chart-box {
+    width: 100%;
+    height: 100%;
+}
+
+.custom-control-input:focus {
+    border-color: #49a078 !important;
+    box-shadow: 0 0 0 0.2rem #49a07840 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='pink'/%3e%3c/svg%3e");
+}
+
+.custom-control-input:checked {
+    border-color: #49a078 !important;
+    background-color: #49a078 !important;
+}
+
+.custom-control-input:active {
+    background-color: #49a078 !important;
+    border-color: #49a078 !important;
+}
+
+.custom-control-input:focus:not(:checked) {
+    border-color: #49a078 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='red'/%3e%3c/svg%3e");
+}
+
+.custom-control-input-green:not(:disabled):active {
+    background-color: #49a078 !important;
+    border-color: #49a078 !important;
+}
+
+
+/* Example used above */
+/* .form-check-input:checked {
+    background-color: red;
+    border-color: pink;
+}
+
+.form-switch .form-check-input {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='red'/%3e%3c/svg%3e");
+}
+
+.form-switch .form-check-input:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='pink'/%3e%3c/svg%3e");
+} */
+
 
 /* 1 = dark
 3 = green
