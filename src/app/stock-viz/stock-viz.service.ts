@@ -4,7 +4,6 @@ import { map } from 'rxjs/operators';
 
 // import { environment } from "../environments/environment";
 import { StockModel } from "../models/stock-model";
-import { stockData } from "./stock_data_updated";
 
 
 @Injectable({
