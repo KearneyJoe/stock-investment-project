@@ -6,6 +6,7 @@ import { Chart, ChartConfiguration, registerables } from 'chart.js';
 Chart.register(...registerables);
 import 'chartjs-plugin-annotation';
 import 'chartjs-adapter-moment';
+import { lastValueFrom } from 'rxjs';
 Chart.defaults.color = '#1f2421';
 
 @Component({
@@ -17,33 +18,40 @@ export class StockVizComponent implements OnInit {
 
   constructor(private stockService: StockVizService) { }
   stockData: StockModel[] = [];
+
+  //Default ticker
   ticker: string = 'GOOGL';
+  tickerValues: string[] = ['AMZN', 'APPL', 'CRM', 'GOOGL', 'META', 'MSFT', 'NFLX', 'SP500', 'TSLA'];
+
+  //Vairables for stock stats
   avgHigh: number;
   minHighData: StockModel | undefined;
   maxHighData: StockModel | undefined;
   bestBuyData: StockModel | undefined;
   bestSellData: StockModel | undefined;
   profit: number;
+
+  //Helps with page & chart rendering
   statsCalculated: boolean = false;
   avgLineToggle: boolean = false;
   bestBuyLineToggle: boolean = false;
   bestSellLineToggle: boolean = false;
-  tickerValues: string[] = ['AMZN', 'APPL', 'CRM', 'GOOGL', 'META', 'MSFT', 'NFLX', 'SP500', 'TSLA'];
   lineChart: Chart;
 
   ngOnInit(): void {
+    //OnInit fetch default ticker data and render chart
     this.onSelectTicker(this.ticker, false)
   }
 
-  onSelectTicker(tickerSymbol: string, destoryPlot: boolean) {
+  async onSelectTicker(tickerSymbol: string, destoryPlot: boolean) {
+    //Get the ticker symbol
     this.ticker = tickerSymbol;
+
     //Reset Checkboxes
     let checkboxAvgLine: any = document.getElementById("avgLineToggleId");
     checkboxAvgLine.checked = false;
-
     let bestBuyLineToggleId: any = document.getElementById("bestBuyLineToggleId");
     bestBuyLineToggleId.checked = false;
-
     let bestSellLineToggleId: any = document.getElementById("bestSellLineToggleId");
     bestSellLineToggleId.checked = false;
 
@@ -52,8 +60,13 @@ export class StockVizComponent implements OnInit {
     this.bestBuyLineToggle = false;
     this.bestSellLineToggle = false;
 
-    this.stockData = this.stockService.getData(this.ticker);
+    //Fetch ticker data from Firebase
+    this.stockData = await lastValueFrom(this.stockService.getData(this.ticker))
+
+    //Create the line plot from fetched data
     this.createLineChart(this.stockData, destoryPlot);
+
+    //Calculate additional stock stats (eg. high, low, etc.)
     let stockStats = this.stockService.calculateStockStats(this.stockData);
     this.avgHigh = stockStats.avgHigh;
     this.minHighData = stockStats.minHighData;
@@ -65,11 +78,13 @@ export class StockVizComponent implements OnInit {
   }
 
   createLineChart(stockData: StockModel[], destroy: boolean = false) {
+    //Builds a new line chart (destroys the current one if exists)
+
     if (destroy) {
       this.lineChart.destroy();
     }
 
-    // extract the dates and high values from the stock data
+    //Extract the dates and high values from the stock data
     const dates = stockData.map(data => data.Date);
     const high = stockData.map(data => data.High);
 
@@ -85,6 +100,7 @@ export class StockVizComponent implements OnInit {
         backgroundColor: '#49a078'
       }]
     }
+
     //Basic chart config
     let config: ChartConfiguration = {
       type: 'line',
@@ -182,6 +198,7 @@ export class StockVizComponent implements OnInit {
       plugins: []
     }
 
+    //Select line-chart element from the DOM
     this.lineChart = new Chart(
       <HTMLCanvasElement>document.getElementById('line-chart'),
       config
@@ -189,12 +206,13 @@ export class StockVizComponent implements OnInit {
   }
 
   controlAvgLine() {
+    //Controls adding and removing the average line
     if (!this.avgLineToggle) {
       const dates = this.stockData.map(data => data.Date);
       const high = this.stockData.map(data => data.High);
       const avgHigh = high.reduce((a, b) => a + b, 0) / high.length;
 
-      //avgHighLine line
+      //avgHighLine 
       const avgHighLine = {
         id: 'avgHighLine',
         beforeDraw(chart: any, args: any, options: any) {
@@ -214,8 +232,7 @@ export class StockVizComponent implements OnInit {
           // ctx.font = '18px Arial'
           ctx.font = `${width * 0.02}px Arial`
           ctx.fillStyle = '#1f2421'
-          ctx.fillText(`Average High $${avgHigh.toFixed(0).toLocaleString()}`, dates.length * .10, y.getPixelForValue(avgHigh) - 15)
-
+          ctx.fillText(`Average High $${avgHigh.toFixed(0).toLocaleString()} `, dates.length * .10, y.getPixelForValue(avgHigh) - 15)
         }
       }
       this.lineChart.config.plugins?.push(avgHighLine)
@@ -239,6 +256,7 @@ export class StockVizComponent implements OnInit {
   }
 
   controlBestBuyLine() {
+    //Controls adding and removing the best buy line
     if (!this.bestBuyLineToggle) {
       //Add the line
       if (this.bestBuyData) {
@@ -257,7 +275,7 @@ export class StockVizComponent implements OnInit {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
             ctx.beginPath()
-            ctx.moveTo(x.getPixelForValue(bestDay), top - top * 0.5)
+            ctx.moveTo(x.getPixelForValue(bestDay), top)
             ctx.lineTo(x.getPixelForValue(bestDay), bottom)
             ctx.stroke()
             ctx.restore();
@@ -266,7 +284,7 @@ export class StockVizComponent implements OnInit {
             // ctx.font = '18px Arial'
             ctx.font = `${width * 0.02}px Arial`
             ctx.fillStyle = '#1f2421'
-            ctx.fillText(`Buy: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top + (height * .05))
+            ctx.fillText(`Buy: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })} `, x.getPixelForValue(bestDay) + (width * .01), top + (height * .05))
           }
         }
         this.lineChart.config.plugins?.push(bestBuyLine)
@@ -274,7 +292,7 @@ export class StockVizComponent implements OnInit {
       }
       this.bestBuyLineToggle = true;
     } else {
-      //remove the line
+      //Remove the line
       if (this.lineChart.config.plugins) {
         let bestBuyLineIdx: number;
         for (let i = 0; i < this.lineChart.config.plugins.length; i++) {
@@ -291,7 +309,7 @@ export class StockVizComponent implements OnInit {
   }
 
   controlBestSellLine() {
-
+    //Controls adding and removing the best sell line
     if (!this.bestSellLineToggle) {
       //Add the line
       if (this.bestSellData) {
@@ -310,7 +328,7 @@ export class StockVizComponent implements OnInit {
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
             ctx.beginPath()
-            ctx.moveTo(x.getPixelForValue(bestDay), top - top * 0.5)
+            ctx.moveTo(x.getPixelForValue(bestDay), top)
             ctx.lineTo(x.getPixelForValue(bestDay), bottom)
             ctx.stroke()
             ctx.restore();
@@ -319,7 +337,7 @@ export class StockVizComponent implements OnInit {
             // ctx.font = '18px Arial'
             ctx.font = `${width * 0.02}px Arial`
             ctx.fillStyle = '#1f2421'
-            ctx.fillText(`Sell: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })}`, x.getPixelForValue(bestDay) + (width * .01), top + (height * .05))
+            ctx.fillText(`Sell: ${bestDay.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })} `, x.getPixelForValue(bestDay) + (width * .01), top + (height * .05))
           }
         }
         this.lineChart.config.plugins?.push(bestSellLine)
@@ -327,7 +345,7 @@ export class StockVizComponent implements OnInit {
       }
       this.bestSellLineToggle = true;
     } else {
-      //remove the line
+      //Remove the line
       if (this.lineChart.config.plugins) {
         let bestSellLineIdx: number;
         for (let i = 0; i < this.lineChart.config.plugins.length; i++) {
@@ -344,6 +362,7 @@ export class StockVizComponent implements OnInit {
   }
 
   resetChart() {
+    //Reset the chart if button is selected
     this.onSelectTicker(this.ticker, true)
   }
 
