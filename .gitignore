@@ -49,3 +49,6 @@ src/app/environments
 
 #todo
 todo.todo
+
+#Local data
+src/app/stock-viz/stock_data_updated.ts
