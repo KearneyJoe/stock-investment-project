@@ -73,10 +73,15 @@ span>button {
     h1,
     h1,
     h3,
-    h4,
+    h4 {
+        font-size: 1em;
+        margin: 0;
+    }
+
     h5,
     h6 {
-        font-size: 1em;
+        margin: 0;
+        font-size: 0.7em;
     }
 
     .btn-group .active {

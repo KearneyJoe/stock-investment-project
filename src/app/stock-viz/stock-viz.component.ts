@@ -8,6 +8,7 @@ import 'chartjs-plugin-annotation';
 import 'chartjs-adapter-moment';
 import { lastValueFrom } from 'rxjs';
 Chart.defaults.color = '#1f2421';
+Chart.defaults.font.size = window.innerWidth > 999 ? 14 : window.innerWidth > 500 ? 12 : window.innerWidth > 1 ? 10 : 10;
 
 @Component({
   selector: 'app-stock-viz',
@@ -122,7 +123,7 @@ export class StockVizComponent implements OnInit {
               text: 'Day',
               color: '#1f2421',
               font: {
-                size: 16,
+                size: window.innerWidth > 999 ? 14 : window.innerWidth > 500 ? 12 : window.innerWidth > 1 ? 10 : 10,
                 style: 'normal',
                 weight: 'bold'
               }
@@ -143,7 +144,7 @@ export class StockVizComponent implements OnInit {
               text: 'Trading High',
               color: '#1f2421',
               font: {
-                size: 16,
+                size: window.innerWidth > 999 ? 14 : window.innerWidth > 500 ? 12 : window.innerWidth > 1 ? 10 : 10,
                 style: 'normal',
                 weight: 'bold'
               }
@@ -162,7 +163,7 @@ export class StockVizComponent implements OnInit {
             labels: {
               color: '#1f2421',
               font: {
-                size: 14,
+                size: window.innerWidth > 999 ? 14 : window.innerWidth > 500 ? 12 : window.innerWidth > 1 ? 10 : 10,
                 // size: ,
                 style: 'normal',
                 weight: 'bold'
@@ -365,7 +366,6 @@ export class StockVizComponent implements OnInit {
     //Reset the chart if button is selected
     this.onSelectTicker(this.ticker, true)
   }
-
 
 }
 

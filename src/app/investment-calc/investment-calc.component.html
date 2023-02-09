@@ -1,1 +1,84 @@
-<p>Work in progress</p>
+<div class="container-fluid" (window:resize)="onResize($event)">
+    <div class="row">
+        <div class="col-md-3 col-sm-12 portfolio-form">
+            <form [formGroup]="investmentForm" (ngSubmit)="onSubmit(investmentForm)">
+                <div class="form-group">
+                    <label for="principal">Principal ($)</label>
+                    <input type="number" class="form-control" id="principal" [placeholder]="formDefaults.principal"
+                        formControlName="principal" min="100" max="1000000">
+                    <small id="principalHelp" class="form-text text-muted">Initial investment</small>
+                    <br>
+                    <small class="error-message"
+                        *ngIf="investmentForm.controls['principal'].status === 'INVALID' && investmentForm.controls['principal'].touched === true">Required
+                        principal between $100 and $1,000,000</small>
+                </div>
+
+                <div class=" form-group">
+                    <label for="rateOfReturn">Rate of return (%)</label>
+                    <input type="number" class="form-control" id="rateOfReturn"
+                        [placeholder]="formDefaults.rateOfReturn" formControlName="rateOfReturn" min="1" max="20">
+                    <small class="error-message"
+                        *ngIf="investmentForm.controls['rateOfReturn'].status === 'INVALID' && investmentForm.controls['rateOfReturn'].touched === true">Required
+                        rate between 1% and 20%</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Compounds</label>
+                    <div *ngFor="let freq of compoundFrequencyOptions">
+                        <label>
+                            <input type="radio" formControlName="compoundFrequency" [value]="freq">
+                            {{freq}}
+                        </label>
+                    </div>
+                    <small class="error-message"
+                        *ngIf="investmentForm.controls['compoundFrequency'].status === 'INVALID' && investmentForm.controls['compoundFrequency'].touched === true">Required</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="investmentHorizon">Years</label>
+                    <input type="number" class="form-control" id="investmentHorizon"
+                        [placeholder]="formDefaults.investmentHorizon" formControlName="investmentHorizon" min="1"
+                        max="50">
+                    <small class="error-message"
+                        *ngIf="investmentForm.controls['investmentHorizon'].status === 'INVALID' && investmentForm.controls['investmentHorizon'].touched === true">Required
+                        years between 1 and 50</small>
+
+                </div>
+
+                <div class="button-div">
+                    <button type="submit" class="btn btn-success"
+                        [disabled]="investmentForm.invalid">Calculate!</button>
+                </div>
+                <hr>
+                <div>
+                    Investment returns formula:
+                    <p class="formula">PV = {{formDefaults.principal | currency:'USD':'symbol':'1.0-2' }} * (1 +
+                        <sup>{{formDefaults.rateOfReturn}}%</sup>/<sub>{{formDefaults.compoundFrequency ===
+                            'Annually' ? 1 :
+                            formDefaults.compoundFrequency === 'Quarterly' ? 4 :
+                            formDefaults.compoundFrequency === 'Monthly' ? 12 :
+                            1}}</sub>)^<sup>({{formDefaults.compoundFrequency === 'Annually' ? 1 :
+                            formDefaults.compoundFrequency === 'Quarterly' ? 4 :
+                            formDefaults.compoundFrequency === 'Monthly' ? 12 :
+                            1}} *
+                            {{formDefaults.investmentHorizon}})</sup>
+                    </p>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="col-md-9 col-sm-12">
+            <div class="chart-container">
+                <h3>Portfolio Value is
+                    <span>{{portfolioValue | currency:'USD':'symbol':'1.0-0'}}</span>
+                </h3>
+                <h6>{{formDefaults.principal | currency:'USD':'symbol':'1.0-0' }} invested over
+                    {{formDefaults.investmentHorizon}}
+                    years at
+                    {{formDefaults.rateOfReturn}}% rate of return</h6>
+                <div class="chart-box"><canvas id="line-chart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
